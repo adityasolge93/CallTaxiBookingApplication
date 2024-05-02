@@ -1,12 +1,7 @@
 package com.g3examples.calltaxi.view;
 
-import com.g3examples.calltaxi.dao.BookingDao;
-import com.g3examples.calltaxi.dao.BookingDaoInterface;
-import com.g3examples.calltaxi.dao.PickDropPointsDao;
-import com.g3examples.calltaxi.dao.PickDropPointsDaoInterface;
-import com.g3examples.calltaxi.dao.TaxiDao;
-import com.g3examples.calltaxi.dao.TaxiDaoInterface;
 import com.g3examples.calltaxi.managers.BookingManager;
+import com.g3examples.calltaxi.managers.PickDropPointsManager;
 import com.g3examples.calltaxi.managers.TaxiManager;
 import com.g3examples.calltaxi.models.BookingDto;
 import com.g3examples.calltaxi.models.TaxiDto;
@@ -19,18 +14,14 @@ public class MainView {
     private static final int DISPLAY_THE_TAXI_DETAILS_CHOICE = 2;
     private static final int EXIT_CHOICE = 3;
 
-    private BookingDaoInterface bookingDao;
     private BookingManager bookingManager;
-    private PickDropPointsDaoInterface pickDropPointsDao;
-    private TaxiDaoInterface taxiDao;
     private TaxiManager taxiManager;
+    private PickDropPointsManager pickDropPointsManager;
 
     public MainView() {
-        pickDropPointsDao = new PickDropPointsDao();
-        taxiDao = new TaxiDao();
-        taxiManager = new TaxiManager(taxiDao, pickDropPointsDao);
-        bookingDao = new BookingDao();
-        bookingManager = new BookingManager(bookingDao, taxiManager, pickDropPointsDao);
+        pickDropPointsManager = new PickDropPointsManager();
+        taxiManager = new TaxiManager(pickDropPointsManager);
+        bookingManager = new BookingManager(taxiManager, pickDropPointsManager);
     }
 
 
@@ -95,11 +86,11 @@ public class MainView {
         taxiManager.addTaxi(taxi3);
         taxiManager.addTaxi(taxi4);
 
-        pickDropPointsDao.addPickDropPoint("A", 0);
-        pickDropPointsDao.addPickDropPoint("B", 15);
-        pickDropPointsDao.addPickDropPoint("C", 30);
-        pickDropPointsDao.addPickDropPoint("D", 45);
-        pickDropPointsDao.addPickDropPoint("E", 60);
-        pickDropPointsDao.addPickDropPoint("F", 75);
+        pickDropPointsManager.addPickDropPoint("A", 0);
+        pickDropPointsManager.addPickDropPoint("B", 15);
+        pickDropPointsManager.addPickDropPoint("C", 30);
+        pickDropPointsManager.addPickDropPoint("D", 45);
+        pickDropPointsManager.addPickDropPoint("E", 60);
+        pickDropPointsManager.addPickDropPoint("F", 75);
     }
 }

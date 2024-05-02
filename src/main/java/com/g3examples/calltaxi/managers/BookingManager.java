@@ -1,27 +1,28 @@
 package com.g3examples.calltaxi.managers;
 
-import com.g3examples.calltaxi.dao.BookingDaoInterface;
-import com.g3examples.calltaxi.dao.PickDropPointsDaoInterface;
 import com.g3examples.calltaxi.models.BookingDto;
 import com.g3examples.calltaxi.models.TaxiDto;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BookingManager {
+    private static Map<String, Integer> locationToDistanceMap = new HashMap<>();
+    private static final List<BookingDto> bookings = new ArrayList<>();
     private static final double BASE_FARE = 100.0;
     private static final double PER_KM_FARE = 10.0;
     private static final int BASE_FARE_THRESHOLD_KM = 5;
 
     private static int bookingSequence = 0;
 
-    private PickDropPointsDaoInterface pickDropPointsDao;
     private TaxiManager taxiManager;
-    private BookingDaoInterface bookingDao;
+    private PickDropPointsManager pickDropPointsManager;
 
-    public BookingManager(BookingDaoInterface bookingDao, TaxiManager taxiManager, PickDropPointsDaoInterface pickDropPointsDao) {
-        this.bookingDao = bookingDao;
+    public BookingManager(TaxiManager taxiManager, PickDropPointsManager pickDropPointsManager) {
         this.taxiManager = taxiManager;
-        this.pickDropPointsDao = pickDropPointsDao;
+        this.pickDropPointsManager = pickDropPointsManager;
     }
 
     public void createBooking(String customerId, String pickupPoint, String dropPoint, int pickupTime) {
@@ -41,7 +42,7 @@ public class BookingManager {
         System.out.println("Taxi can be allotted");
 
         double fare;
-        int distance = pickDropPointsDao.distanceBetweenTwoPoints(pickupPoint, dropPoint);
+        int distance = pickDropPointsManager.distanceBetweenTwoPoints(pickupPoint, dropPoint);
         if (distance <= BASE_FARE_THRESHOLD_KM) {
             fare = BASE_FARE;
         } else {
@@ -59,7 +60,7 @@ public class BookingManager {
         bookingDto.setPickupTime(pickupTime);
         bookingDto.setDropTime(pickupTime + travelDurationInHour);
         bookingDto.setFare(fare);
-        bookingDao.addBooking(bookingDto);
+        bookings.add(bookingDto);
 
         // Update taxi details
         allottedTaxi.setEarnings(allottedTaxi.getEarnings() + fare);
@@ -71,8 +72,7 @@ public class BookingManager {
     }
 
     public List<BookingDto> getBookingsByTaxiNo(String taxiNo) {
-        List<BookingDto> allBookings = bookingDao.getAllBookings();
-        return allBookings.stream()
+        return bookings.stream()
                 .filter(bookingDto -> bookingDto.getTaxiNo().equals(taxiNo))
                 .toList();
     }
